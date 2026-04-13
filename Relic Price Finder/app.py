@@ -1,5 +1,5 @@
 from flask import Flask, render_template, request
-from core import get_top_items
+from core import get_top_items, CACHE
 
 app = Flask(__name__)
 
@@ -9,6 +9,14 @@ def home():
     # Query params
     min_price = int(request.args.get("min_price", 0))
     sort = request.args.get("sort", "desc")
+
+    refresh = request.args.get("refresh")
+
+    # ✅ CLEAR CACHE if refresh pressed
+    if refresh:
+        CACHE["data"] = None
+        CACHE["timestamp"] = 0
+        print("Cache cleared!")
 
     data = get_top_items()
 

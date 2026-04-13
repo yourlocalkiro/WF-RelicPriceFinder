@@ -38,20 +38,20 @@ def get_data():
 def get_unvaulted_relics():
     return {
         # Lith
-        "Lith A6", "Lith C7", "Lith G13", "Lith M9",
-        "Lith N16", "Lith P9", "Lith W4", "Lith X1",
+        "Lith C14", "Lith C7", "Lith E2", "Lith G14",
+        "Lith K12", "Lith N18", "Lith N19", "Lith Q2",
 
         # Meso
-        "Meso A7", "Meso E6", "Meso F5", "Meso G8",
-        "Meso N11", "Meso N17", "Meso T7", "Meso V10",
+        "Meso A10", "Meso A9", "Meso D8", "Meso E7",
+        "Meso L4", "Meso N11", "Meso V13", "Meso V15", "Meso X1",
 
         # Neo
-        "Neo A13", "Neo G8", "Neo L4", "Neo P7",
-        "Neo Q1", "Neo V9", "Neo W2", "Neo Z11",
+        "Neo C7", "Neo K9", "Neo N24", "Neo P10",
+        "Neo S20", "Neo T10", "Neo V11", "Neo V9",
 
         # Axi
-        "Axi A19", "Axi G14", "Axi H8", "Axi O6",
-        "Axi S16", "Axi S17", "Axi S8", "Axi T12", "Axi V10",
+        "Axi C11", "Axi D6", "Axi S20", "Axi S8",
+        "Axi T13", "Axi V10", "Axi V14", "Axi Y1", "Axi Y3",
     }
 
 # ---------------------------
@@ -195,6 +195,16 @@ def calculate_best_relic(relic_map, item_prices):
     return best[:5]
 
 def get_top_items():
+    now = time.time()
+
+    # ✅ USE CACHE if still valid
+    if CACHE["data"] and now - CACHE["timestamp"] < CACHE_DURATION:
+        print("Using cached data")
+        return CACHE["data"]
+
+    print("Fetching fresh data...")
+
+    # ---- YOUR EXISTING LOGIC ----
     data = get_data()
 
     active_relics = get_unvaulted_relics()
@@ -209,14 +219,12 @@ def get_top_items():
 
     item_prices = dict(results)
 
-    # ✅ SORT ALL ITEMS (not just top 5)
     sorted_items = sorted(
         item_prices.items(),
         key=lambda x: x[1],
         reverse=True
     )
 
-    # ✅ BUILD OUTPUT CLEANLY
     output = []
     for item, price in sorted_items:
         output.append({
@@ -227,10 +235,18 @@ def get_top_items():
 
     best_relics = calculate_best_relic(relic_map, item_prices)
 
-    return {
+    result = {
         "items": output,
         "best_relics": best_relics
     }
+
+    if len(output) < 80:
+        print("Bad data, not caching")
+    else:
+        CACHE["data"] = result
+        CACHE["timestamp"] = time.time()
+
+    return result
 
 
 # ---------------------------
