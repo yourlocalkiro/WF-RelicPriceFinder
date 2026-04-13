@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Warframe Relic Value Finder</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #111;
+            color: #eee;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .item {
+            background: #1e1e1e;
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 8px;
+        }
+
+        .price {
+            color: #4caf50;
+            font-weight: bold;
+        }
+
+        .relics {
+            color: #aaa;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Relic Drop Values</h1>
+
+{% for entry in data %}
+    <div class="item">
+        <div>
+            {{ loop.index }}. {{ entry.item }}
+            <span class="price">({{ entry.price }}p)</span>
+        </div>
+        <div class="relics">
+            Relics: {{ entry.relics | join(', ') }}
+        </div>
+    </div>
+{% endfor %}
+
+</body>
+</html>
