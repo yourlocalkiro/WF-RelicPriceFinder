@@ -2,6 +2,15 @@ import aiohttp
 import asyncio
 import requests
 
+import time
+
+CACHE = {
+    "data": None,
+    "timestamp": 0
+}
+
+CACHE_DURATION = 300  # 5 minutes
+
 # ---------------------------
 # CONFIG
 # ---------------------------
@@ -172,6 +181,26 @@ async def fetch_all_prices(items):
 # ---------------------------
 # MAIN FUNCTION
 # ---------------------------
+
+def calculate_best_relic(relic_map, item_prices):
+    relic_values = {}
+
+    for relic, items in relic_map.items():
+        total = 0
+        count = 0
+
+        for item in items:
+            price = item_prices.get(item, 0)
+            total += price
+            count += 1
+
+        if count > 0:
+            relic_values[relic] = total / count
+
+    best = sorted(relic_values.items(), key=lambda x: x[1], reverse=True)
+
+    return best[:5]
+
 def get_top_items():
     data = get_data()
 
@@ -203,7 +232,12 @@ def get_top_items():
             "relics": item_map[item]
         })
 
-    return output
+    best_relics = calculate_best_relic(relic_map, item_prices)
+
+    return {
+        "items": output,
+        "best_relics": best_relics
+    }
 
 
 # ---------------------------

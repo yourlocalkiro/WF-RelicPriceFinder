@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Warframe Relic Value Finder</title>
+    <title>Relic Value Finder</title>
     <style>
         body {
             font-family: Arial;
-            background-color: #111;
-            color: #eee;
+            background: #0f172a;
+            color: #e2e8f0;
             padding: 20px;
         }
 
@@ -14,38 +14,122 @@
             text-align: center;
         }
 
+        .controls {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 8px;
+            margin: 5px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button {
+            background: #22c55e;
+            color: white;
+            cursor: pointer;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: auto;
+        }
+
         .item {
-            background: #1e1e1e;
-            padding: 10px;
-            margin: 10px 0;
+            background: #1e293b;
+            padding: 12px;
+            margin: 8px 0;
             border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .item:hover {
+            background: #334155;
         }
 
         .price {
-            color: #4caf50;
+            color: #4ade80;
             font-weight: bold;
         }
 
         .relics {
-            color: #aaa;
+            color: #94a3b8;
+            font-size: 0.9em;
+        }
+
+        .best {
+            background: #020617;
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            margin-top: 50px;
+            display: none;
         }
     </style>
+
+    <script>
+        function showLoading() {
+            document.getElementById("loading").style.display = "block";
+        }
+    </script>
 </head>
 <body>
 
-<h1>Relic Drop Values</h1>
+<h1>Relic Value Finder</h1>
 
-{% for entry in data %}
-    <div class="item">
-        <div>
-            {{ loop.index }}. {{ entry.item }}
-            <span class="price">({{ entry.price }}p)</span>
-        </div>
-        <div class="relics">
-            Relics: {{ entry.relics | join(', ') }}
-        </div>
+<div class="container">
+
+    <div class="controls">
+        <form method="get" onsubmit="showLoading()">
+            Min Price:
+            <input type="number" name="min_price" value="{{ min_price }}">
+
+            Sort:
+            <select name="sort">
+                <option value="desc" {% if sort == "desc" %}selected{% endif %}>
+                    Highest First
+                </option>
+                <option value="asc" {% if sort == "asc" %}selected{% endif %}>
+                    Lowest First
+                </option>
+            </select>
+
+            <button type="submit">Apply</button>
+            <button type="submit" name="refresh" value="1">Refresh</button>
+        </form>
     </div>
-{% endfor %}
+
+    <div id="loading" class="loading">
+        🔄 Loading market data... (takes a few seconds)
+    </div>
+
+    <div class="best">
+        <h2>🔥 Best Relics (Estimated Value)</h2>
+        {% for relic, value in best_relics %}
+            <div>{{ relic }} (~{{ value|round }}p avg)</div>
+        {% endfor %}
+    </div>
+
+    {% for entry in items %}
+        <div class="item">
+            <div>
+                {{ loop.index }}. {{ entry.item }}
+                <span class="price">({{ entry.price }}p)</span>
+            </div>
+            <div class="relics">
+                Relics: {{ entry.relics | join(', ') }}
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
 
 </body>
 </html>
