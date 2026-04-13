@@ -35,31 +35,24 @@ def get_data():
 # ---------------------------
 # GET UNVAULTED RELICS
 # ---------------------------
-def get_unvaulted_relics(data):
-    active = set()
+def get_unvaulted_relics():
+    return {
+        # Lith
+        "Lith A6", "Lith C7", "Lith G13", "Lith M9",
+        "Lith N16", "Lith P9", "Lith W4", "Lith X1",
 
-    missions = data["missionRewards"]
+        # Meso
+        "Meso A7", "Meso E6", "Meso F5", "Meso G8",
+        "Meso N11", "Meso N17", "Meso T7", "Meso V10",
 
-    for planet in missions.values():
-        for mission in planet.values():
-            for rotation in mission.values():
-                if not isinstance(rotation, list):
-                    continue
+        # Neo
+        "Neo A13", "Neo G8", "Neo L4", "Neo P7",
+        "Neo Q1", "Neo V9", "Neo W2", "Neo Z11",
 
-                for reward in rotation:
-
-                    # Handle dict or string
-                    if isinstance(reward, dict):
-                        item = reward.get("itemName", "")
-                    else:
-                        item = reward
-
-                    if "Relic" in item:
-                        relic_name = item.replace(" Relic", "").strip()
-                        active.add(relic_name)
-
-    print(f"Active relics: {len(active)}")
-    return active
+        # Axi
+        "Axi A19", "Axi G14", "Axi H8", "Axi O6",
+        "Axi S16", "Axi S17", "Axi S8", "Axi T12", "Axi V10",
+    }
 
 # ---------------------------
 # BUILD RELIC → ITEMS MAP
@@ -204,7 +197,7 @@ def calculate_best_relic(relic_map, item_prices):
 def get_top_items():
     data = get_data()
 
-    active_relics = get_unvaulted_relics(data)
+    active_relics = get_unvaulted_relics()
     relic_map = build_relic_map(data, active_relics)
     item_map = build_item_map(relic_map)
 
