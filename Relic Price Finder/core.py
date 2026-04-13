@@ -2,6 +2,15 @@ import aiohttp
 import asyncio
 import requests
 
+import time
+
+CACHE = {
+    "data": None,
+    "timestamp": 0
+}
+
+CACHE_DURATION = 300  # 5 minutes
+
 # ---------------------------
 # CONFIG
 # ---------------------------
@@ -193,6 +202,14 @@ def calculate_best_relic(relic_map, item_prices):
     return best[:5]
 
 def get_top_items():
+    global CACHE
+
+    now = time.time()
+
+    # ✅ RETURN CACHED DATA
+    if CACHE["data"] and now - CACHE["timestamp"] < CACHE_DURATION:
+        print("Using cached data...")
+        return CACHE["data"]
     data = get_data()
 
     active_relics = get_unvaulted_relics(data)
@@ -225,10 +242,16 @@ def get_top_items():
 
     best_relics = calculate_best_relic(relic_map, item_prices)
 
-    return {
+    result = {
         "items": output,
         "best_relics": best_relics
     }
+
+    # ✅ SAVE TO CACHE
+    CACHE["data"] = result
+    CACHE["timestamp"] = now
+
+    return result
 
 
 # ---------------------------
